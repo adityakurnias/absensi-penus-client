@@ -52,15 +52,11 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: [
-    "@nuxt/icon",
-    "@vite-pwa/nuxt",
-    (_, nuxt) => {
-      nuxt.hook("pwa:beforeBuildServiceWorker", (options) => {
-        console.log("pwa:beforeBuildServiceWorker: ", options.base);
-      });
-    },
-  ],
+  modules: ["@nuxt/icon", "@vite-pwa/nuxt", (_, nuxt) => {
+    nuxt.hook("pwa:beforeBuildServiceWorker", (options) => {
+      console.log("pwa:beforeBuildServiceWorker: ", options.base);
+    });
+  }],
 
   pwa: {
     registerType: "autoUpdate",
