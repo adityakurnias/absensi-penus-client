@@ -31,7 +31,7 @@ Untuk menjalankan proyek ini secara lokal, ikuti langkah-langkah berikut:
 
 ### Prasyarat
 
-Pastikan Anda memiliki [Node.js](https://nodejs.org/en/) (versi 18+) dan [pnpm](https://pnpm.io/) terinstal di sistem Anda.
+Pastikan Anda memiliki [bun](https://bun.sh/) terinstal di sistem Anda.
 
 ### Instalasi
 
@@ -43,7 +43,7 @@ Pastikan Anda memiliki [Node.js](https://nodejs.org/en/) (versi 18+) dan [pnpm](
 
 2.  **Instal dependensi:**
     ```bash
-    pnpm install
+    bun install
     ```
 
 ### Menjalankan Server Pengembangan
@@ -51,7 +51,7 @@ Pastikan Anda memiliki [Node.js](https://nodejs.org/en/) (versi 18+) dan [pnpm](
 Untuk menjalankan server pengembangan dengan hot-reloading:
 
 ```bash
-pnpm dev
+bun dev
 ```
 
 Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
@@ -61,14 +61,14 @@ Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 Untuk membangun aplikasi untuk produksi:
 
 ```bash
-pnpm build
+bun build
 ```
 
 Perintah ini akan membuat direktori `.output` dengan semua aset yang siap untuk di-deploy.
 
 Untuk melihat hasil build secara lokal:
 ```bash
-pnpm preview
+bun preview
 ```
 
 ## 📁 Struktur Proyek
