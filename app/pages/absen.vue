@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+  <div class="min-h-screen bg-linear-to-br from-blue-50 to-indigo-50">
     <AbsenStatus
       v-if="showStatus"
       :status="status"
@@ -10,7 +10,9 @@
 
     <template v-else>
       <div class="p-4 space-y-4">
-        <TimeCard :current-time="currentTime" />
+          <CardInfoCard />
+          
+        <CardTimeCard :current-time="currentTime" />
         <template v-if="!hasAbsenMasuk || !hasAbsenPulang">
           <CardAbsen @success="handleSuccess" @error="handleError" />
         </template>
@@ -24,7 +26,8 @@
             </p>
           </div>
         </template>
-        <InfoCard />
+        <Footer />
+        
       </div>
     </template>
   </div>

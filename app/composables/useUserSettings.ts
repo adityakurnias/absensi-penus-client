@@ -45,7 +45,7 @@ export const useUserSettings = () => {
         body: userData,
       });
 
-      // Pastikan response memiliki data yang diperbarui
+      // Memastikan response memiliki data yang diperbarui
       if (response && response.data) {
         localStorage.setItem('user_name', response.data.name || '');
         localStorage.setItem('user_email', response.data.email || '');

@@ -4,6 +4,7 @@ import type { AbsentData, AttendanceData, LocationData } from "~/types";
 export const useAbsen = () => {
   const photo = ref<File | null>(null);
   const location = ref<LocationData | null>(null);
+  const ttd = ref<string>("");
   const isCapturing = ref(false);
   const isSubmitting = ref(false);
   const error = ref<string | null>(null);
@@ -109,7 +110,7 @@ export const useAbsen = () => {
         "longitude",
         String(attendanceData.location?.longitude ?? "")
       );
-      formData.append("keterangan_pulang", attendanceData.keterangan_pulang);
+      formData.append("ttd", attendanceData.ttd);
 
       const data = await $fetch(`${config.public.apiUrl}/v2/absen/masuk`, {
         method: "POST",
@@ -138,7 +139,6 @@ export const useAbsen = () => {
       const formData = new FormData();
       formData.append("photo_izin", absentData.photo);
       formData.append("keterangan", absentData.keterangan);
-      formData.append("keterangan_masuk", absentData.keterangan_masuk);
 
       const data = await $fetch(`${config.public.apiUrl}/v1/absen/izin`, {
         method: "POST",
@@ -185,7 +185,7 @@ export const useAbsen = () => {
       let errorMsg = "Gagal mengirim data presensi.";
 
       if (error?.statusCode === 403) {
-        errorMsg = "Anda sudah melakukan absen pulang hari ini.";
+        errorMsg = error.data.message;
       } else if (error?.data?.message) {
         errorMsg = error.data.message;
       }

@@ -29,24 +29,15 @@
                     @retake-photo="() => setPhoto(null)"
                     @file-change="handleFileChange"
                 />
-
-                <textarea
-                    v-model="AttendanceData.keterangan_masuk"
-                    v-if="!isPulang"
-                    rows="4"
-                    placeholder="Keterangan masuk (opsional)"
-                    class="block p-2.5 w-full mb-0 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <textarea
-                    v-model="AttendanceData.keterangan_pulang"
-                    v-if="isPulang"
-                    rows="4"
-                    placeholder="Keterangan pulang (opsional)"
-                    class="block p-2.5 w-full mb-0 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                />
                 
-                <Signature />
-
+                <div class="flex flex-col -space-y-2">
+                    <h2 class="text-lg font-semibold text-gray-800">Tanda tangan<span class="text-red-600">*</span></h2>
+                    <Signature
+                        ref="signatureRef"
+                        @sendSignature="onReceiveSignature"
+                    />
+                </div>
+                
                 <BaseButton
                     v-if="photo && location"
                     :is-submitting="isSubmitting"
@@ -63,6 +54,8 @@
 </template>
 
 <script setup lang="ts">
+import type Signature from '../Signature.vue';
+
 const {
     photo,
     location,
@@ -82,11 +75,15 @@ const AttendanceData = ref({
     photo: null as File | null,
     location: null as { latitude: number; longitude: number } | null,
     timestamp: new Date(),
+    ttd: "",
     keterangan_masuk: "",
     keterangan_pulang: "",
 });
 
 const emit = defineEmits(["success", "error"]);
+
+const signatureBase64 = ref<string | null>(null);
+const signatureRef = ref<InstanceType<typeof Signature> | null>(null);
 
 const isPulang = computed(() => new Date().getHours() >= 13);
 
@@ -97,6 +94,12 @@ const buttonText = computed(() =>
 const headerText = computed(() =>
     isPulang.value ? "Presensi Pulang" : "Presensi Masuk",
 );
+
+
+function onReceiveSignature(base64: string) {
+  signatureBase64.value = base64;
+}
+
 
 const handleCameraCapture = async () => {
     try {
@@ -147,6 +150,7 @@ const handleSubmitMasuk = async () => {
     try {
         AttendanceData.value.photo = photo.value;
         AttendanceData.value.location = location.value;
+        AttendanceData.value.ttd = signatureBase64.value ?? ""
         await submitAttendance(AttendanceData.value);
         hasSubmitted.value = true;
         emit("success");

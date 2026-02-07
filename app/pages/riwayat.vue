@@ -1,16 +1,18 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-    <div class="mx-auto px-4 py-8">
-      <CardRecapCard class="mb-8" />
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div class="mx-auto px-4 py-8">
+            <CardRecapCard class="mb-8" />
 
-      <History />
+            <History />
+
+            <Footer />
+        </div>
     </div>
-  </div>
 </template>
 
 <script lang="ts" setup>
 definePageMeta({
-  layout: "main",
+    layout: "main",
 });
 </script>
 

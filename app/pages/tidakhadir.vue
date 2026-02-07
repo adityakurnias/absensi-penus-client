@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+  <div class="min-h-screen bg-linear-to-br from-blue-50 to-indigo-50">
     <AbsenStatus
       v-if="showStatus"
       :status="status"
@@ -12,6 +12,7 @@
       <div class="p-4 space-y-4">
         <CardIzinCard @success="handleSuccess" @error="handleError" />
         <CardInfoCard />
+        <Footer />
       </div>
     </template>
   </div>

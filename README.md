@@ -89,3 +89,6 @@ app/
 ## 📄 Lisensi
 
 Proyek ini dilisensikan di bawah [MIT License](LICENSE).
+
+## 📝 Changelog
+- [CHANGELOG.md](CHANGELOG.md)

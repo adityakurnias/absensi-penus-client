@@ -1,6 +1,6 @@
 {
   "name": "trabsen",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,11 +15,13 @@
     "@selemondev/vue3-signature-pad": "^1.8.2",
     "@tailwindcss/vite": "^4.1.11",
     "@vite-pwa/nuxt": "^1.0.4",
-    "nuxt": "^4.0.1",
+    "baseline-browser-mapping": "^2.9.19",
+    "caniuse-lite": "^1.0.30001769",
+    "nuxt": "^4.3.0",
     "nuxt-signature-pad": "1.8.0",
     "tailwindcss": "^4.1.11",
     "vue": "^3.5.18",
-    "vue-router": "^4.5.1",
+    "vue-router": "^5.0.2",
     "workbox-core": "^7.4.0",
     "workbox-precaching": "^7.4.0",
     "workbox-routing": "^7.4.0"
