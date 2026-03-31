@@ -30,13 +30,10 @@
                     @file-change="handleFileChange"
                 />
 
-                <textarea
-                    v-model="AttendanceData.keterangan_masuk"
-                    v-if="!isPulang"
-                    rows="4"
-                    placeholder="Keterangan masuk (opsional)"
-                    class="block p-2.5 w-full mb-0 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                />
+                <div v-if="!isPulang" class="space-y-2 mt-2">
+                    <label class="block text-sm font-medium text-gray-700">Tanda Tangan (Wajib)</label>
+                    <SignaturePad v-model="AttendanceData.ttd" />
+                </div>
                 <textarea
                     v-model="AttendanceData.keterangan_pulang"
                     v-if="isPulang"
@@ -80,7 +77,7 @@ const AttendanceData = ref({
     photo: null as File | null,
     location: null as { latitude: number; longitude: number } | null,
     timestamp: new Date(),
-    keterangan_masuk: "",
+    ttd: "",
     keterangan_pulang: "",
 });
 
@@ -156,6 +153,12 @@ onMounted(async () => {
 const handleSubmitMasuk = async () => {
     if (!photo.value || !location.value) {
         error.value = "Foto dan lokasi diperlukan untuk presensi";
+        emit("error", error.value);
+        return;
+    }
+
+    if (!AttendanceData.value.ttd) {
+        error.value = "Tanda tangan wajib diisi untuk absen masuk";
         emit("error", error.value);
         return;
     }

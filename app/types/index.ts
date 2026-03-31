@@ -8,7 +8,7 @@ export interface AttendanceData {
   photo: File | null;
   location: LocationData | null;
   timestamp: Date;
-  keterangan_masuk: string;
+  ttd: string; // Tanda Tangan (Base64 URL)
   keterangan_pulang: string;
 }
 

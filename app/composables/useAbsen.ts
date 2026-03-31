@@ -87,7 +87,7 @@ export const useAbsen = () => {
   const getCurrentLocation = (): Promise<LocationData> => {
     return new Promise((resolve, reject) => {
       // TEMPORARY MOCK FOR TESTING - uncomment to use
-      /*
+
       console.warn("MOCK GPS ACTIVE: Using hardcoded coordinates for testing.");
       resolve({
         latitude: -6.467017,
@@ -95,7 +95,7 @@ export const useAbsen = () => {
         accuracy: 10,
       });
       return;
-      */
+      
 
       if (!navigator.geolocation) {
         reject(new Error("Geolocation tidak didukung oleh browser ini"));
