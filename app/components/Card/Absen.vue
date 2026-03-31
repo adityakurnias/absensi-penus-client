@@ -86,7 +86,15 @@ const AttendanceData = ref({
 
 const emit = defineEmits(["success", "error"]);
 
-const isPulang = computed(() => new Date().getHours() >= 13);
+const userRole = ref("");
+const hasMasuk = ref(false);
+
+const isPulang = computed(() => {
+    if (userRole.value === "guru") {
+        return hasMasuk.value;
+    }
+    return new Date().getHours() >= 13;
+});
 
 const buttonText = computed(() =>
     isPulang.value ? "Kirim Presensi Pulang" : "Kirim Presensi Masuk",
@@ -125,10 +133,23 @@ const handleSubmit = async () => {
 const hasSubmitted = ref(false);
 
 onMounted(async () => {
+    if (typeof window !== "undefined") {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+            try {
+                const userObj = JSON.parse(userStr);
+                userRole.value = userObj.role?.toLowerCase() || "";
+            } catch (e) {}
+        }
+    }
+
+    const checkMasuk = await checkAbsenMasukStatus();
+    hasMasuk.value = checkMasuk;
+
     if (isPulang.value) {
         hasSubmitted.value = await checkAbsenPulangStatus();
     } else {
-        hasSubmitted.value = await checkAbsenMasukStatus();
+        hasSubmitted.value = checkMasuk;
     }
 });
 

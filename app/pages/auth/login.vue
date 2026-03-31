@@ -180,6 +180,8 @@ definePageMeta({
 });
 
 const handleLogin = async () => {
+  if (isLoading.value) return;
+
   error.value = "";
   success.value = "";
   isLoading.value = true;

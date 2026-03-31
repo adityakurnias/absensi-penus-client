@@ -115,10 +115,13 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useAbsen } from "~/composables/useAbsen";
 
 const isOpen = ref(false);
+const { clearAbsenCache } = useAbsen();
 
 const logout = () => {
+  clearAbsenCache();
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   navigateTo("/login");

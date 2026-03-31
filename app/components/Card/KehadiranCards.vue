@@ -7,32 +7,30 @@
         <div
           :class="[
             'w-14 h-14 rounded-xl flex items-center justify-center shadow-md',
-            isCheckedIn && currentHour < 13
-              ? 'bg-gradient-to-br from-green-500 to-green-600'
-              : isCheckedOut && currentHour >= 13
+            !shouldRedirect
               ? 'bg-gradient-to-br from-green-500 to-green-600'
               : 'bg-gradient-to-br from-yellow-500 to-yellow-600',
           ]">
           <Icon
-            :name="isCheckedIn ? 'lucide:calendar-check' : 'lucide:calendar'"
+            :name="!shouldRedirect ? 'lucide:calendar-check' : 'lucide:calendar'"
             class="w-7 h-7 text-white" />
         </div>
         <div>
           <p class="text-gray-600 font-medium">
-            <span v-if="isCheckedIn && currentHour < 13">Terima kasih telah presensi</span>
-            <span v-else-if="isCheckedOut && currentHour >= 13">Terima kasih telah presensi pulang</span>
-            <span v-else>Tekan untuk presensi</span>
+            <span v-if="!isPulangPhase && isCheckedIn">Terima kasih telah presensi</span>
+            <span v-else-if="isPulangPhase && isCheckedOut">Terima kasih telah presensi pulang</span>
+            <span v-else>Tekan untuk presensi{{ isPulangPhase ? ' pulang' : '' }}</span>
           </p>
           <h3 class="text-xl font-bold text-gray-800">
             <span
-              v-if="isCheckedIn && currentHour < 13"
+              v-if="!isPulangPhase && isCheckedIn"
               class="text-green-500">✓ Sudah Presensi</span>
             <span
-              v-else-if="isCheckedOut && currentHour >= 13"
+              v-else-if="isPulangPhase && isCheckedOut"
               class="text-green-500">✓ Sudah Presensi Pulang</span>
             <span
               v-else
-              class="text-yellow-500">Belum Presensi</span>
+              class="text-yellow-500">Belum Presensi{{ isPulangPhase ? ' Pulang' : '' }}</span>
           </h3>
         </div>
       </div>
@@ -48,13 +46,31 @@ const attendanceRate = ref(90);
 const isCheckedIn = ref(false);
 const isCheckedOut = ref(false);
 const currentHour = ref(new Date().getHours());
+const userRole = ref("");
+
+const isPulangPhase = computed(() => {
+  if (userRole.value === "guru") {
+    return isCheckedIn.value;
+  }
+  return currentHour.value >= 13;
+});
 
 const shouldRedirect = computed(() => {
-  return (currentHour.value < 13 && !isCheckedIn.value) ||
-         (currentHour.value >= 13 && !isCheckedOut.value);
+  return (!isPulangPhase.value && !isCheckedIn.value) ||
+         (isPulangPhase.value && !isCheckedOut.value);
 });
 
 onMounted(async () => {
+  if (typeof window !== "undefined") {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        const userObj = JSON.parse(userStr);
+        userRole.value = userObj.role?.toLowerCase() || "";
+      } catch (e) {}
+    }
+  }
+
   isCheckedIn.value = await checkAbsenMasukStatus();
   isCheckedOut.value = await checkAbsenPulangStatus();
 });

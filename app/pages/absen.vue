@@ -42,7 +42,14 @@ const currentTime = ref(new Date());
 const hasAbsenMasuk = ref(false);
 const hasAbsenPulang = ref(false);
 
-const isPulang = computed(() => new Date().getHours() >= 13);
+const userRole = ref("");
+
+const isPulang = computed(() => {
+  if (userRole.value === "guru") {
+    return hasAbsenMasuk.value;
+  }
+  return new Date().getHours() >= 13;
+});
 
 definePageMeta({
   layout: "main",
@@ -55,6 +62,16 @@ onMounted(async () => {
 
   hasAbsenMasuk.value = await checkAbsenMasukStatus();
   hasAbsenPulang.value = await checkAbsenPulangStatus();
+
+  if (typeof window !== "undefined") {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        const userObj = JSON.parse(userStr);
+        userRole.value = userObj.role?.toLowerCase() || "";
+      } catch (e) {}
+    }
+  }
 
   onUnmounted(() => {
     clearInterval(timer);

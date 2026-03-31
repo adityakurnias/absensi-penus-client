@@ -1,6 +1,9 @@
 import { ref } from "vue";
 import type { AbsentData, AttendanceData, LocationData } from "~/types";
 
+let activeMasukReq: Promise<boolean> | null = null;
+let activePulangReq: Promise<boolean> | null = null;
+
 export const useAbsen = () => {
   const photo = ref<File | null>(null);
   const location = ref<LocationData | null>(null);
@@ -33,34 +36,67 @@ export const useAbsen = () => {
     throw new Error(errorMsg);
   };
 
-  const checkAbsenMasukStatus = async (): Promise<boolean> => {
-    try {
-      const userId = getUserId();
-      if (!userId) throw new Error("User ID not found.");
+  const checkAbsenMasukStatus = (): Promise<boolean> => {
+    if (typeof window !== "undefined" && activeMasukReq) return activeMasukReq;
 
-      await apiFetch(`${config.public.apiUrl}/v1/absen/cek-masuk/${userId}`);
-      return true;
-    } catch (err: any) {
-      if (err?.statusCode === 401) return false;
-      throw new Error("Gagal memeriksa status absen masuk.");
+    const promise = (async () => {
+      try {
+        const userId = getUserId();
+        if (!userId) throw new Error("User ID not found.");
+
+        await apiFetch(`${config.public.apiUrl}/v1/absen/cek-masuk/${userId}`);
+        return true;
+      } catch (err: any) {
+        const status = err?.statusCode || err?.status || err?.response?.status;
+        if (typeof window !== "undefined") activeMasukReq = null; // Clear on error so it can retry
+        if (status === 401 || status === 404) return false;
+        throw new Error("Gagal memeriksa status absen masuk.");
+      }
+    })();
+
+    if (typeof window !== "undefined") {
+      activeMasukReq = promise;
     }
+    return promise;
   };
 
-  const checkAbsenPulangStatus = async (): Promise<boolean> => {
-    try {
-      const userId = getUserId();
-      if (!userId) throw new Error("User ID not found.");
+  const checkAbsenPulangStatus = (): Promise<boolean> => {
+    if (typeof window !== "undefined" && activePulangReq) return activePulangReq;
 
-      await apiFetch(`${config.public.apiUrl}/v1/absen/cek-pulang/${userId}`);
-      return true;
-    } catch (err: any) {
-      if (err?.statusCode === 401) return false;
-      throw new Error("Gagal memeriksa status absen pulang.");
+    const promise = (async () => {
+      try {
+        const userId = getUserId();
+        if (!userId) throw new Error("User ID not found.");
+
+        await apiFetch(`${config.public.apiUrl}/v1/absen/cek-pulang/${userId}`);
+        return true;
+      } catch (err: any) {
+        const status = err?.statusCode || err?.status || err?.response?.status;
+        if (typeof window !== "undefined") activePulangReq = null; // Clear on error so it can retry
+        if (status === 401 || status === 404) return false;
+        throw new Error("Gagal memeriksa status absen pulang.");
+      }
+    })();
+
+    if (typeof window !== "undefined") {
+      activePulangReq = promise;
     }
+    return promise;
   };
 
   const getCurrentLocation = (): Promise<LocationData> => {
     return new Promise((resolve, reject) => {
+      // TEMPORARY MOCK FOR TESTING - uncomment to use
+      /*
+      console.warn("MOCK GPS ACTIVE: Using hardcoded coordinates for testing.");
+      resolve({
+        latitude: -6.467017,
+        longitude: 106.864356,
+        accuracy: 10,
+      });
+      return;
+      */
+
       if (!navigator.geolocation) {
         reject(new Error("Geolocation tidak didukung oleh browser ini"));
         return;
@@ -108,11 +144,13 @@ export const useAbsen = () => {
 
   const submitAttendance = async (data: AttendanceData) => {
     if (!data.photo) throw new Error("Foto presensi tidak tersedia.");
-    return await performSubmission("/v2/absen/masuk", data.photo, "photo_masuk", {
+    const res = await performSubmission("/v2/absen/masuk", data.photo, "photo_masuk", {
       latitude: data.location?.latitude,
       longitude: data.location?.longitude,
       keterangan_pulang: data.keterangan_pulang,
     });
+    if (typeof window !== "undefined") activeMasukReq = Promise.resolve(true);
+    return res;
   };
 
   const submitAbsent = async (data: AbsentData) => {
@@ -125,10 +163,12 @@ export const useAbsen = () => {
 
   const submitPulang = async (data: AttendanceData) => {
     if (!data.photo) throw new Error("Foto presensi tidak tersedia.");
-    return await performSubmission("/v1/absen/pulang", data.photo, "photo_pulang", {
+    const res = await performSubmission("/v1/absen/pulang", data.photo, "photo_pulang", {
       latitude: data.location?.latitude,
       longitude: data.location?.longitude,
     });
+    if (typeof window !== "undefined") activePulangReq = Promise.resolve(true);
+    return res;
   };
 
   const setPhoto = (file: File | null) => {
@@ -149,6 +189,13 @@ export const useAbsen = () => {
     isSubmitting.value = false;
   };
 
+  const clearAbsenCache = () => {
+    if (typeof window !== "undefined") {
+      activeMasukReq = null;
+      activePulangReq = null;
+    }
+  };
+
   return {
     photo,
     location,
@@ -164,5 +211,6 @@ export const useAbsen = () => {
     setPhoto,
     checkAbsenMasukStatus,
     checkAbsenPulangStatus,
+    clearAbsenCache,
   };
 };
